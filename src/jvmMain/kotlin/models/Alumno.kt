@@ -1,3 +1,3 @@
 package models
 
-data class Alumno(val siglas:String , val nombre: String )
+data class Alumno( val id:Int, val siglas:String , val nombre: String )

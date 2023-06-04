@@ -12,7 +12,7 @@ class Reader {
      *
      * @return the matrix containing the data from the file
      */
-    fun fuckYOU(path: String): MutableList<MutableList<String>> {
+    fun read(path: String): MutableList<MutableList<String>> {
         File(path).bufferedReader().use { reader ->
             var line = reader.readLine()
             while (line != null) {
