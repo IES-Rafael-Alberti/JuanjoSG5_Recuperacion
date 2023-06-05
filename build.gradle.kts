@@ -23,6 +23,9 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
+                implementation("com.zaxxer:HikariCP:5.0.1")
+                implementation("com.h2database:h2:2.1.214")
+                implementation("org.slf4j:slf4j-simple:2.0.7")
             }
         }
         val jvmTest by getting
