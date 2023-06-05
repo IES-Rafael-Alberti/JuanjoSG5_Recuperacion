@@ -12,132 +12,146 @@ import javax.sql.DataSource
 class DaoUnidad(private var dataSource: DataSource):Dao<Unidad,Results> {
     override fun createEntity(unidad: Unidad): Result<Unidad, Results> {
         val sql = "INSERT INTO Unidad (nombre) VALUES (?)"
-
-            dataSource.connection.use { conn ->
-                Log.info("fuck2")
-                conn.prepareStatement(sql).use { stmt ->
-                    Log.info("fuck3")
-                    stmt.setString(1, unidad.nombre)
-                    try {
-                        Log.info("DaoUnidad.createEntity -> Executing query")
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, unidad.nombre)
+                try {
+                    Log.info("DaoUnidad.createEntity -> Executing query")
                     stmt.executeUpdate()
-                } catch (e: Exception) {
-                    Log.warning("DaoUnidad.createEntity -> $e")
-                    return Result(unidad, Results.FAILURE)
-                }
-                    return Result(unidad, Results.SUCCESSFUL)
-                }
+            } catch (e: Exception) {
+                Log.warning("DaoUnidad.createEntity -> $e")
+                return Result(unidad, Results.FAILURE)
             }
+                Log.info("DaoUnidad.createEntity -> Query executed")
+                return Result(unidad, Results.SUCCESSFUL)
+            }
+        }
     }
 
-    override fun getById(id: Int): Unidad? {
+    override fun getById(id: Int): Result<Unidad?, Results> {
         val sql = "SELECT * FROM Unidad WHERE ID = ?"
         var unidad: Unidad? = null
-        dataSource.connection.use {conn ->
+        dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
-                stmt.setString(1, id.toString())
-                val rs = stmt.executeQuery()
-                if (rs.next()) {
-                    unidad = Unidad(
-                        nombre = rs.getString("nombre")
-                    )
-                }else {
-                    null
+                stmt.setInt(1, id)
+                try {
+                    Log.info("DaoUnidad.getById -> Executing query")
+                    val rs = stmt.executeQuery()
+                    if (rs.next()) {
+                        unidad = Unidad(
+                                nombre = rs.getString("nombre")
+                        )
+                    }
+                    Log.info("DaoUnidad.getById -> Query executed")
+                    return Result(unidad, Results.SUCCESSFUL)
+                } catch (e: Exception) {
+                    Log.warning("DaoUnidad.getById -> $e")
+                    return Result(unidad, Results.FAILURE)
                 }
             }
         }
-        return unidad
     }
 
-    override fun getAll(): List<Unidad> {
+    override fun getAll(): Result<List<Unidad>, Results> {
         val sql = "SELECT * FROM Unidad"
         val result = mutableListOf<Unidad>()
-
-        try {
-            dataSource.connection.use { conn ->
-                conn.prepareStatement(sql).use { stmt ->
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                try {
+                    Log.info("DaoUnidad.getAll -> Executing query")
                     val resultSet = stmt.executeQuery()
-
                     while (resultSet.next()) {
                         val nombre = resultSet.getString("nombre")
 
                         val unid = Unidad(nombre)
                         result.add(unid)
                     }
+                    Log.info("DaoUnidad.getAll -> Query executed")
+                    return Result(result, Results.SUCCESSFUL)
+                } catch (e: SQLException) {
+                    Log.warning("DaoUnidad.getAll -> $e")
+                    return Result(emptyList(), Results.FAILURE)
                 }
             }
-        } catch (e: SQLException) {
-            // Handle the exception
-            e.printStackTrace()
-            // Return an appropriate value or throw a custom exception
-            return emptyList()
-        }
-
-        return result
-    }
-
-    override fun deleteEntity(unidad: Unidad): Int? {
-        val sql = "DELETE FROM Unidad WHERE nombre = ?"
-        try {
-            dataSource.connection.use { conn ->
-                conn.prepareStatement(sql).use { stmt ->
-                    stmt.setString(1, unidad.nombre)
-                    return stmt.executeUpdate()
-                }
-            }
-        } catch (e: SQLException) {
-            // Handle the exception
-            e.printStackTrace()
-            return -1
         }
     }
-    override fun updateEntity(unid: Unidad): Int {
+
+    override fun deleteEntity(entity: Unidad): Result<Unidad, Results> {
+        TODO("Not yet implemented")
+    }
+
+
+    override fun updateEntity(unidad: Unidad): Result<Unidad, Results> {
         val sql = "UPDATE Unidad SET nombre = ? WHERE nombre = ?"
-        try {
-            dataSource.connection.use { conn ->
-                conn.prepareStatement(sql).use { stmt ->
-                    stmt.setString(1, unid.nombre)
-                    return stmt.executeUpdate()
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, unidad.nombre)
+                try {
+                    Log.info("DaoUnidad.updateEntity -> Executing Update")
+                    val rowsAffected = stmt.executeUpdate()
+                    if (rowsAffected > 0) {
+                        Log.info("DaoUnidad.updateEntity -> $rowsAffected rows updated")
+                        return Result(unidad, Results.SUCCESSFUL)
+                    } else {
+                        Log.info("DaoUnidad.updateEntity -> 0 rows updated")
+                        return Result(unidad, Results.FAILURE)
+                    }
+                }catch (e: SQLException) {
+                        Log.warning("DaoUnidad.updateEntity -> $e")
+                        return Result(unidad, Results.FAILURE)
                 }
             }
-        } catch (e: SQLException) {
-            // Handle the exception
-            e.printStackTrace()
-            return -1
         }
     }
 
 
-    override fun createTable() {
-        val sql =
-            "CREATE TABLE Unidad (" +
-                    "nombre VARCHAR2(50) PRIMARY KEY); "
+
+
+    override fun createTable(): Result<Unit, Results> {
+        val sql = "CREATE TABLE Unidad (nombre VARCHAR2(50) PRIMARY KEY);"
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
-                stmt.executeUpdate()
-                Log.info("Tabla Unidad creada")
+                try {
+                    stmt.executeUpdate()
+                    Log.info("Tabla Unidad creada")
+                    return Result(Unit, Results.SUCCESSFUL)
+                }catch (e: SQLException) {
+                        Log.warning("DaoUnidad.createTable -> $e")
+                        return Result(Unit, Results.FAILURE)
+                    }
             }
         }
+
     }
-    override fun deleteTable() {
-        val sql ="DROP TABLE Unidad;"
+
+    override fun deleteTable(): Result<Unit, Results> {
+        val sql = "DROP TABLE Unidad;"
         dataSource.connection.use { conn ->
             conn.prepareStatement(sql).use { stmt ->
-                stmt.executeUpdate()
+                try {
+                    stmt.executeUpdate()
+                    return Result(Unit, Results.SUCCESSFUL)
+                } catch (e: SQLException) {
+                    Log.warning("DaoUnidad.deleteTable -> $e")
+                    return Result(Unit, Results.FAILURE)
+                }
             }
         }
+
     }
+
 }
 
 fun main(){
     val source = DataFactory.getDataSource(DataFactory.DataSourceType.Embedded)
     val dod = DaoUnidad(source)
     dod.createTable()
-    dod.createEntity(Unidad("test"))
-    dod.createEntity(Unidad("test2"))
+    val uni2 = dod.createEntity(Unidad("test"))
+    val uni = dod.createEntity(Unidad("test2"))
+    
+    dod.getAll()
+    dod.updateEntity(uni2.obj)
     println(DaoUnidad(source).getAll().toString())
-    Log.info("fuccccccccccccccccccccccckkkkkkkkkkkkk")
-
 }
 
 
