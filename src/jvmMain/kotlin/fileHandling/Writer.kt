@@ -4,7 +4,7 @@ import java.io.File
 
 
 /**
- * A class for writing data from a file into a matrix.
+ * Writing data from a  matrix into a CSV file.
  */
 class Writer() {
     /**

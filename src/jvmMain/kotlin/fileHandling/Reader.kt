@@ -1,13 +1,13 @@
 package fileHandling
 
+import log.Log
 import java.io.File
 
-
 /**
- * The `Reader` class provides functionality to read data from a CSV file.
+ * Provides functionality to read data from a CSV file.
  */
-class Reader {
-    private val matrix: MutableList<MutableList<String>> = mutableListOf()
+open class Reader {
+    internal val matrix: MutableList<MutableList<String>> = mutableListOf()
 
     /**
      * Reads the contents of a CSV file located at the given [path] and returns the data as a mutable list of mutable lists.
@@ -18,10 +18,12 @@ class Reader {
      */
     fun read(path: String): MutableList<MutableList<String>> {
         File(path).bufferedReader().use { reader ->
+            Log.info("Reader.read -> Starting to read the CSV file")
             var line = reader.readLine()
             while (line != null) {
                 val row = parseRow(line)
                 matrix.add(row)
+                Log.info("Reader.read -> Added a row of data from the CSV file")
                 line = reader.readLine()
             }
         }
@@ -39,6 +41,7 @@ class Reader {
         val currentCell = StringBuilder()
 
         var i = 0
+        Log.info("Reader.parseRow -> Parsing a row of data")
         while (i < line.length) {
             when (val currentChar = line[i]) {
                 ',' -> {
@@ -54,8 +57,8 @@ class Reader {
             }
             i++
         }
-
         addCellToRow(row, currentCell)
+        Log.info("Reader.parseRow -> Finished parsing a row of data")
         return row
     }
 
@@ -67,6 +70,7 @@ class Reader {
      * @return The extracted quoted value.
      */
     private fun extractQuotedValue(line: String, startIndex: Int): String {
+        Log.info("Reader.extractQuotedValue -> Extracting the value enclosed in quotes")
         val endIndex = line.indexOf('"', startIndex + 1)
         return line.substring(startIndex + 1, endIndex)
     }
@@ -78,12 +82,11 @@ class Reader {
      * @param cell The cell value.
      */
     private fun addCellToRow(row: MutableList<String>, cell: StringBuilder) {
+        Log.info("Reader.addCellToRow -> Adding a cell value to the row")
         row.add(cell.toString().trim())
     }
-
-
-
 }
+
 
 
 
@@ -93,9 +96,10 @@ fun main() {
     val csvFile = "src/jvmMain/kotlin/files/ud1.csv"  // Replace with the actual file path
     val reader = Reader()
     val matrix = reader.read(csvFile)
-
-
-    println(matrix[19][8])
-    println(matrix[8][19])
+    val column = matrix.size
+    val row = matrix[0].size
+    println(matrix)
+    println(matrix[1])
+    println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
 }
 

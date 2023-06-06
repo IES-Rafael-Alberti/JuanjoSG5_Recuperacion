@@ -32,9 +32,7 @@ object DataFactory {
 
     private fun hikariConfig(): HikariDataSource {
         val config = HikariConfig()
-        config.jdbcUrl = "jdbc:h2:mem:default"
-        config.username = "user"
-        config.password = "user"
+        config.jdbcUrl = "jdbc:h2:./default"
         config.driverClassName = "org.h2.Driver"
         config.maximumPoolSize = 10
         config.isAutoCommit = true

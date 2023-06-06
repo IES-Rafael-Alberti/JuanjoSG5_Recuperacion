@@ -1,12 +1,11 @@
 package dao
 
-import models.CE
-import models.Unidad
+import models.criterioEvalu
 import railway.Result
 import railway.Results
 import javax.sql.DataSource
 
-class DaoCE(private var dataSource: DataSource):Dao<CE, Results> {
+class DaoCE(private var dataSource: DataSource):Dao<criterioEvalu, Results> {
     override fun createTable(): Result<Unit, Results> {
         TODO("Not yet implemented")
     }
@@ -15,23 +14,23 @@ class DaoCE(private var dataSource: DataSource):Dao<CE, Results> {
         TODO("Not yet implemented")
     }
 
-    override fun getById(id: Int): Result<CE?, Results> {
+    override fun getById(entity: criterioEvalu): Result<criterioEvalu?, Results> {
         TODO("Not yet implemented")
     }
 
-    override fun getAll(): Result<List<CE>, Results> {
+    override fun getAll(): Result<List<criterioEvalu>, Results> {
         TODO("Not yet implemented")
     }
 
-    override fun deleteEntity(entity: CE): Result<CE, Results> {
+    override fun deleteEntity(entity: criterioEvalu): Result<criterioEvalu, Results> {
         TODO("Not yet implemented")
     }
 
-    override fun updateEntity(entity: CE): Result<CE, Results> {
+    override fun updateEntity(entity: criterioEvalu): Result<criterioEvalu, Results> {
         TODO("Not yet implemented")
     }
 
-    override fun createEntity(entity: CE): Result<CE, Results> {
+    override fun createEntity(entity: criterioEvalu): Result<criterioEvalu, Results> {
         TODO("Not yet implemented")
     }
 }
