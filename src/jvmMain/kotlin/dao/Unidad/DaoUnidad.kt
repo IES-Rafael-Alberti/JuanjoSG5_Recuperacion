@@ -77,10 +77,27 @@ class DaoUnidad(private var dataSource: DataSource):Dao<Unidad,Results> {
     }
 
     override fun deleteEntity(entity: Unidad): Result<Unidad, Results> {
-        TODO("Not yet implemented")
+        val sql = "DELETE FROM Unidad WHERE nombre = ?"
+        dataSource.connection.use { conn ->
+            conn.prepareStatement(sql).use { stmt ->
+                stmt.setString(1, entity.nombre)
+                try {
+                    Log.info("DaoUnidad.deleteEntity -> Executing delete")
+                    val rowsAffected = stmt.executeUpdate()
+                    if (rowsAffected > 0) {
+                        Log.info("DaoUnidad.deleteEntity -> $rowsAffected rows deleted")
+                        return Result(entity, Results.SUCCESSFUL)
+                    } else {
+                        Log.info("DaoUnidad.deleteEntity -> 0 rows deleted")
+                        return Result(entity, Results.FAILURE)
+                    }
+                } catch (e: SQLException) {
+                    Log.warning("DaoUnidad.deleteEntity -> $e")
+                    return Result(entity, Results.FAILURE)
+                }
+            }
+        }
     }
-
-
     override fun updateEntity(unidad: Unidad): Result<Unidad, Results> {
         val sql = "UPDATE Unidad SET nombre = ? WHERE nombre = ?"
         dataSource.connection.use { conn ->
@@ -121,7 +138,6 @@ class DaoUnidad(private var dataSource: DataSource):Dao<Unidad,Results> {
                     }
             }
         }
-
     }
 
     override fun deleteTable(): Result<Unit, Results> {
@@ -140,18 +156,6 @@ class DaoUnidad(private var dataSource: DataSource):Dao<Unidad,Results> {
 
     }
 
-}
-
-fun main(){
-    val source = DataFactory.getDataSource(DataFactory.DataSourceType.Embedded)
-    val dod = DaoUnidad(source)
-    dod.createTable()
-    val uni2 = dod.createEntity(Unidad("test"))
-    val uni = dod.createEntity(Unidad("test2"))
-    
-    dod.getAll()
-    dod.updateEntity(uni2.obj)
-    println(DaoUnidad(source).getAll().toString())
 }
 
 
