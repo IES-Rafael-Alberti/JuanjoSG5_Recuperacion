@@ -6,8 +6,8 @@ import java.io.File
 /**
  * Provides functionality to read data from a CSV file.
  */
-open class Reader {
-    internal val matrix: MutableList<MutableList<String>> = mutableListOf()
+object Reader {
+    val matrix: MutableList<MutableList<String>> = mutableListOf()
 
     /**
      * Reads the contents of a CSV file located at the given [path] and returns the data as a mutable list of mutable lists.
@@ -87,19 +87,4 @@ open class Reader {
     }
 }
 
-
-
-
-
-
-fun main() {
-    val csvFile = "src/jvmMain/kotlin/files/ud1.csv"  // Replace with the actual file path
-    val reader = Reader()
-    val matrix = reader.read(csvFile)
-    val column = matrix.size
-    val row = matrix[0].size
-    println(matrix)
-    println(matrix[1])
-    println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
-}
 
